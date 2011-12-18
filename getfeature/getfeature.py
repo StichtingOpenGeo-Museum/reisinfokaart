@@ -44,6 +44,8 @@ def getfeature(environ, start_response):
 		db = MySQLdb.connect(host="127.0.0.1", port=9306)
 		c = db.cursor()
 		c.execute("""SELECT tpc, naam, lat_radians, lon_radians, type FROM openov, openov_metaphone WHERE match(%s);""", (query))
+		rows = c.fetchall()
+		c.close()
 		results = []
 		for row in rows:
 			results.append({'tpc': row[0], 'naam': row[1], 'lat': math.degrees(row[2]), 'lon': math.degrees(row[3]), 'type': row[4]})
