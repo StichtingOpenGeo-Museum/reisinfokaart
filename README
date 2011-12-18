@@ -1,1 +1,6 @@
 In deze repository vind je alles om zelf een interactieve kaart te maken.
+
+Het programma getfeature zorgt er voor dat iemand die op de kaart klikt van een punt of een steekwoord naar een bekende timingpointcode kan gaan. Wij gebruiken hiervoor SphinxSearch. Je kunt met Sphinx op een zelfde manier als MySQL verbinden en bevragen. Het is alleen in zijn eigen domein veel sneller dan MySQL. In de map kun je ook onze configuratie vinden. De data zullen we ook publiceren.
+
+Het programma getfeature.py kun je starten met:
+uwsgi --http 0.0.0.0:7000 -w getfeature
