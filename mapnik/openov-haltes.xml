@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE Map [
+<!ENTITY % entities SYSTEM "inc/entities.xml.inc">
+%entities;
+]>
+<Map bgcolor="transparent" srs="&srs900913;">
+  &fontset-settings;
+  <Style name="haltes">
+    <Rule>
+      <Filter>[type] = 'locatie'</Filter>
+      <PointSymbolizer width="4" height="4" allow_overlap="true" />
+    </Rule>
+    <Rule>
+      <Filter>[type] = 'statisch'</Filter>
+      <PointSymbolizer width="4" height="4" allow_overlap="true" file="images/yellow-dot.png" />
+    </Rule>
+    <Rule>
+      <Filter>[type] = 'kv55'</Filter>
+      <PointSymbolizer width="4" height="4" allow_overlap="true" file="images/green-dot.png" />
+    </Rule>
+    <Rule>
+      <Filter>[type] = 'kv55-arriva'</Filter>
+      <PointSymbolizer width="4" height="4" allow_overlap="true" file="images/green-dot.png" />
+    </Rule>
+  </Style>
+
+  <Layer name="haltes" status="on" srs="&srs900913;">
+    <StyleName>haltes</StyleName>
+    <Datasource><Parameter name="table">
+      (select the_geom, tpc, naam, type from openov_900913) as haltes
+      </Parameter>
+      &datasource-settings;
+    </Datasource>
+  </Layer>
+
+</Map>
