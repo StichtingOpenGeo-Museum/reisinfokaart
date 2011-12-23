@@ -4,9 +4,9 @@ var map = null;
 function init() {
 
     // start position for the map (hardcoded here for simplicity)
-    var lat = 52.37;
-    var lon = 4.9;
-    var zoom = 12;
+    var lat = 52.15;
+    var lon = 5.2;
+    var zoom = 10;
 
     OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
         defaultHandlerOptions: {
@@ -79,7 +79,7 @@ function init() {
         attribution: '<br />Zones via <a href="http://www.agi-rws.nl/">AGI-RWS</a>',
         numZoomLevels: 19,
         isBaseLayer: false,
-        visibility: true
+        visibility: false
     });
 
     var ov_haltes = new OpenLayers.Layer.OSM("Haltes", "http://tiles.mijndev.openstreetmap.nl:8080/openov-haltes/${z}/${x}/${y}.png", {
