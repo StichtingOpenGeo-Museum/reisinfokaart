@@ -35,27 +35,17 @@ function init() {
                     // alert(data[0]['naam']);
                     $("#tijden").empty();
                     $("#tijden").show();
-                    for (x = 0; x < data.length; x++) {
-                        if (data[x]['type'] == 'kv55') {
-                            $("#tijden").append('<h1>' + data[x]['naam'] + '</h1><div id="tpc_' + data[x]['tpc'] + '">Laden van GOVI...</div>');
-                            $.ajax({
-                                url: "http://cache.govi.openov.nl/kv55/" + data[x]['tpc'],
-                                success: renderKV55,
-                                dataType: "xml"
-                            });
-                        } else if (data[x]['type'] == 'kv55-arriva') {
-                            $("#tijden").append('<h1>' + data[x]['naam'] + '</h1><div id="tpc_' + data[x]['tpc'] + '">Laden van Arriva...</div>');
-                            $.ajax({
-                                url: "http://cache.govi.openov.nl/arriva/" + data[x]['tpc'],
-                                success: renderKV55,
-                                dataType: "xml"
-                            });
+                    callbackGeocoder(data);
+                    if (data.length > 1) {
+                        tpcs = '';
+                        for (x = 0; x < data.length; x++) {
+                            tpcs += data[x]['tpc']+',';
                         }
+                        $("#tijden").append('<br /><a class="combibookmark" href="overzicht.html?tpc='+tpcs+'">Combinatie bookmark</a>');
                     }
                 }
             }, "json");
         }
-
     });
 
     // complex object of type OpenLayers.Map
@@ -99,6 +89,73 @@ function init() {
     if (!map.getCenter()) {
         map.setCenter(new OpenLayers.LonLat(lon, lat).transform(new OpenLayers.Projection("EPSG:4326"), map.getProjectionObject()), zoom);
     }
+}
+
+function getQuerystring(key, default_)
+{
+  if (default_==null) default_="";
+  key = key.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+  var regex = new RegExp("[\\?&]"+key+"=([^&#]*)");
+  var qs = regex.exec(window.location.href);
+  if(qs == null)
+    return default_;
+  else
+    return qs[1];
+}
+
+function init_bookmark() {
+    tpc = getQuerystring('tpc');
+    tpcs = tpc.split(',');
+
+    if (tpc != '' && tpcs.length > 0) {
+        for (x = 0; x < tpcs.length; x++) {
+            if (tpcs[x] != '') {
+                queryGeocoder('query='+tpcs[x], callbackGeocoder);
+            }
+        }
+    } else {
+        query = getQuerystring('query');
+        if (query != '') {
+            queryGeocoder('query='+query, callbackRedirect);
+        } else {
+            $("#tijden").append('<p>Als je nog geen halte hebt geselecteerd kun je dat nu nog via <a href="index.html">de kaart</a> doen. Of het zoekgedeelte hierboven.</p>');
+        }
+    }
+}
+function callbackRedirect(data) {
+    if (data != null && data.length > 0) {
+        tpcs = ''
+        for (x = 0; x < data.length; x++) {
+            tpcs += data[x]['tpc']+',';
+        }
+        window.location = 'overzicht.html?tpc='+tpcs;
+    } else {
+        $("#tijden").empty()
+        $("#tijden").append('<p>We konden deze steekwoorden niet vinden, probeer het eens via de <a href="index.html">de kaart</a>.</p>');
+    }
+}
+
+function callbackGeocoder(data) {
+    if (data != null && data.length > 0) {
+       // alert(data[0]['naam']);
+       for (x = 0; x < data.length; x++) {
+            if (data[x]['type'] == 'kv55') {
+                $("#tijden").append('<h1><a href="overzicht.html?tpc='+data[x]['tpc']+'">'+data[x]['naam']+'</a></h1><div id="tpc_'+data[x]['tpc']+'">Laden van GOVI...</div>');
+                $.ajax({url: "http://cache.govi.openov.nl/kv55/"+data[x]['tpc'], success: renderKV55, dataType: "xml"});
+            } else if (data[x]['type'] == 'kv55-arriva') {
+                $("#tijden").append('<h1><a href="overzicht.html?tpc='+data[x]['tpc']+'">'+data[x]['naam']+'</a></h1><div id="tpc_'+data[x]['tpc']+'">Laden van Arriva...</div>');
+                $.ajax({url: "http://cache.govi.openov.nl/arriva/"+data[x]['tpc'], success: renderKV55, dataType: "xml"});
+            } else if (data[x]['type'] == 'statisch') {
+                $("#tijden").append('<h1><a href="overzicht.html?tpc='+data[x]['tpc']+'">'+data[x]['naam']+'</a></h1><div id="tpc_'+data[x]['tpc']+'">Van deze halte hebben we alleen statische gegevens, deze worden nog niet weergegeven.</div>');
+            } else {
+                $("#tijden").append('<h1><a href="overzicht.html?tpc='+data[x]['tpc']+'">'+data[x]['naam']+'</a></h1><div id="tpc_'+data[x]['tpc']+'">Helaas hebben we van deze halte alleen een locatie.</div>');
+            }
+        }
+    }
+}
+
+function queryGeocoder(querystring, callback) {
+    $.get('http://mijndev.openstreetmap.nl:7000?'+querystring, callback, "json");
 }
 
 function renderKV55(xmlDoc) {
