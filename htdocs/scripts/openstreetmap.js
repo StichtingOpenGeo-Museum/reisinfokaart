@@ -162,7 +162,11 @@ function queryGeocoder(querystring, callback) {
 }
 
 function renderKV55(xmlDoc) {
-    tpc = xmlDoc.getElementsByTagName("TimingPointCode")[0].childNodes[0].nodeValue;
+    tpc = xmlDoc.getElementsByTagName("TimingPointCode")
+
+    if (tpc != null)
+        tpc = tpc[0].childNodes[0].nodeValue;
+
     output = ''
     trips = xmlDoc.getElementsByTagName("Trip");
     for (i = 0; i < trips.length; i++) {
