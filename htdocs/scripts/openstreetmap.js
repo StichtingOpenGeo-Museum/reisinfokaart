@@ -145,6 +145,9 @@ function callbackGeocoder(data) {
             } else if (data[x]['type'] == 'kv55-arriva') {
                 $("#tijden").append('<h1><a href="overzicht.html?tpc='+data[x]['tpc']+'">'+data[x]['naam']+'</a></h1><div id="tpc_'+data[x]['tpc']+'">Laden van Arriva...</div>');
                 $.ajax({url: "http://cache.govi.openov.nl/arriva/"+data[x]['tpc'], success: renderKV55, dataType: "xml"});
+            } else if (data[x]['type'] == 'ns') {
+                $("#tijden").append('<h1><a href="overzicht.html?tpc='+data[x]['tpc']+'">'+data[x]['naam']+'</a></h1><div id="tpc_'+data[x]['tpc']+'">Laden van NS-API...</div>');
+                $.ajax({url: "http://nsapi.xmpp.openov.nl/stations/"+data[x]['tpc']+"/avt/", success: renderNSAPIDisco, dataType: "xml"});
             } else if (data[x]['type'] == 'statisch') {
                 $("#tijden").append('<h1><a href="overzicht.html?tpc='+data[x]['tpc']+'">'+data[x]['naam']+'</a></h1><div id="tpc_'+data[x]['tpc']+'">Van deze halte hebben we alleen statische gegevens, deze worden nog niet weergegeven.</div>');
             } else {
@@ -176,4 +179,23 @@ function renderKV55(xmlDoc) {
     }
     $("#tpc_" + tpc).empty();
     $("#tpc_" + tpc).append(output);
+}
+
+function renderNSAPIDisco(xmlDoc) {
+    var station = null;
+    items = xmlDoc.getElementsByTagName("item");
+    output = ''
+    for (i = 0; i < items.length; i++) {
+        var node = [];
+        var name = [];
+
+        node = items[i].attributes['node'].nodeValue.split('/');
+        name = items[i].attributes['name'].nodeValue.replace('richting ', '').split(' ');
+
+        output += '<b>' + name.shift() + '</b>&nbsp;' + name.join(' ') + '<br />';
+        station = node[1];
+    }
+
+    $("#tpc_" + station).empty();
+    $("#tpc_" + station).append(output);
 }
