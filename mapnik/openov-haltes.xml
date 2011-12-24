@@ -22,6 +22,10 @@
       <Filter>[type] = 'kv55-arriva'</Filter>
       <PointSymbolizer width="4" height="4" allow_overlap="true" file="images/green-dot.png" />
     </Rule>
+    <Rule>
+      <Filter>[type] = 'ns'</Filter>
+      <PointSymbolizer width="4" height="4" allow_overlap="true" file="images/green-dot.png" />
+    </Rule>
   </Style>
 
   <Layer name="haltes" status="on" srs="&srs900913;">
