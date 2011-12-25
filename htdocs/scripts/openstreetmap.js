@@ -4,9 +4,9 @@ var map = null;
 function init() {
 
     // start position for the map (hardcoded here for simplicity)
-    var lat = 52.15;
+    var lat = 52.07;
     var lon = 5.2;
-    var zoom = 10;
+    var zoom = 8;
 
     OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
         defaultHandlerOptions: {
@@ -148,6 +148,9 @@ function callbackGeocoder(data) {
             } else if (data[x]['type'] == 'ns') {
                 $("#tijden").append('<h1><a href="overzicht.html?tpc='+data[x]['tpc']+'">'+data[x]['naam']+'</a></h1><div id="tpc_'+data[x]['tpc']+'">Laden van NS-API...</div>');
                 $.ajax({url: "http://nsapi.xmpp.openov.nl/stations/"+data[x]['tpc']+"/avt/", success: renderNSAPIDisco, dataType: "xml"});
+            } else if (data[x]['type'] == 'irail') {
+                $("#tijden").append('<h1><a href="overzicht.html?tpc='+data[x]['tpc']+'">'+data[x]['naam']+'</a></h1><div id="tpc_'+data[x]['tpc'].replace(/[.]/g, "_")+'">Laden van iRail...</div>');
+                $.ajax({url: "http://api.irail.be/liveboard/?id="+data[x]['tpc'], success: renderIRail, dataType: "xml"});
             } else if (data[x]['type'] == 'statisch') {
                 $("#tijden").append('<h1><a href="overzicht.html?tpc='+data[x]['tpc']+'">'+data[x]['naam']+'</a></h1><div id="tpc_'+data[x]['tpc']+'">Van deze halte hebben we alleen statische gegevens, deze worden nog niet weergegeven.</div>');
             } else {
@@ -198,6 +201,36 @@ function renderNSAPIDisco(xmlDoc) {
 
         output += '<b>' + name.shift() + '</b>&nbsp;' + name.join(' ') + '<br />';
         station = node[1];
+    }
+
+    $("#tpc_" + station).empty();
+    $("#tpc_" + station).append(output);
+}
+
+function addzero(i){
+    if (i < 10) {
+       i = "0" + i;
+    }
+    return i;
+}
+
+function renderIRail(xmlDoc) {
+    // All the code in this function was, if remotely possible, shamelessly plagiarized from: https://github.com/iRail/Widgets/blob/master/maps/js/openstreetmap.js#L70
+    station = xmlDoc.getElementsByTagName("station")[0].attributes['id'].nodeValue.replace(/[.]/g, "_");
+
+    departures = xmlDoc.getElementsByTagName("departure");
+    output = '';
+    for (i = 0; i < departures.length; i++) {
+        name = departures[i].getElementsByTagName("station")[0].childNodes[0].nodeValue;
+        expected_date = new Date(departures[i].getElementsByTagName("time")[0].childNodes[0].nodeValue * 1000);
+        expected = addzero(expected_date.getHours()) + ":" + addzero(expected_date.getMinutes());
+        delay = departures[i].getAttribute("delay");
+        delay = Math.floor(delay/60);
+        if(delay > 0){
+            output   += '<b>'+expected+' <font color="red">+' + delay + 'min</font>' + '</b>' + '&nbsp;'+ name + '<br />';
+        } else {
+            output   += '<b>'+expected+'</b>' + '&nbsp;'+ name + '<br />';
+        }
     }
 
     $("#tpc_" + station).empty();
