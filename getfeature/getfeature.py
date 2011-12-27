@@ -21,6 +21,14 @@ def getfeature(environ, start_response):
 
 
 	if lat is not None and lon is not None:
+		radius = 40.0
+		if 'radius' in request.params:
+			try:
+				radius =  float(request.params["radius"])
+			except:
+				pass
+
+
 		db = MySQLdb.connect(host="127.0.0.1", port=9306)
 		c = db.cursor()
 		if 'query' in request.params:
@@ -28,7 +36,7 @@ def getfeature(environ, start_response):
 			c.execute("""SELECT tpc, naam, lat_radians, lon_radians, geodist(%s, %s, lat_radians, lon_radians) AS distance, type FROM openov, openov_metaphone WHERE match(%s) ORDER BY distance ASC;""", (math.radians(lat), math.radians(lon), query))
 
 		else:
-			c.execute("""SELECT tpc, naam, lat_radians, lon_radians, geodist(%s, %s, lat_radians, lon_radians) AS distance, type FROM openov, openov_metaphone WHERE distance <= 40.0 ORDER BY distance ASC;""", (math.radians(lat), math.radians(lon)))
+			c.execute("""SELECT tpc, naam, lat_radians, lon_radians, geodist(%s, %s, lat_radians, lon_radians) AS distance, type FROM openov, openov_metaphone WHERE distance <= """+str(radius)+""" ORDER BY distance ASC LIMIT 15;""", (math.radians(lat), math.radians(lon)))
 
 		rows = c.fetchall()
 		c.close()
@@ -45,7 +53,6 @@ def getfeature(environ, start_response):
 		c = db.cursor()
 		c.execute("""SELECT tpc, naam, lat_radians, lon_radians, type FROM openov, openov_metaphone WHERE match(%s);""", (query))
 		rows = c.fetchall()
-		c.close()
 		results = []
 		for row in rows:
 			results.append({'tpc': row[0], 'naam': row[1], 'lat': math.degrees(row[2]), 'lon': math.degrees(row[3]), 'type': row[4]})

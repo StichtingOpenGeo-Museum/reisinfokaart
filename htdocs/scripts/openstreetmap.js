@@ -30,7 +30,7 @@ function init() {
         trigger: function (e) {
             var lonlat = map.getLonLatFromViewPortPx(e.xy);
             lonlatGCS = lonlat.transform(new OpenLayers.Projection("EPSG:900913"), new OpenLayers.Projection("EPSG:4326"));
-            $.get('http://mijndev.openstreetmap.nl:7000?lat=' + lonlat.lat + '&lon=' + lonlat.lon, function (data) {
+            $.get('http://mijndev.openstreetmap.nl:7000?radius='+Math.floor(1000*(1-Math.log(map.zoom)) + 1800)+'&lat=' + lonlat.lat + '&lon=' + lonlat.lon, function (data) {
                 if (data != null && data.length > 0) {
                     // alert(data[0]['naam']);
                     $("#tijden").empty();
@@ -139,22 +139,24 @@ function callbackGeocoder(data) {
     if (data != null && data.length > 0) {
        // alert(data[0]['naam']);
        for (x = 0; x < data.length; x++) {
-            if (data[x]['type'] == 'kv55') {
-                $("#tijden").append('<h1><a href="overzicht.html?tpc='+data[x]['tpc']+'">'+data[x]['naam']+'</a></h1><div id="tpc_'+data[x]['tpc']+'">Laden van GOVI...</div>');
-                $.ajax({url: "http://cache.govi.openov.nl/kv55/"+data[x]['tpc'], success: renderKV55, dataType: "xml"});
-            } else if (data[x]['type'] == 'kv55-arriva') {
-                $("#tijden").append('<h1><a href="overzicht.html?tpc='+data[x]['tpc']+'">'+data[x]['naam']+'</a></h1><div id="tpc_'+data[x]['tpc']+'">Laden van Arriva...</div>');
-                $.ajax({url: "http://cache.govi.openov.nl/arriva/"+data[x]['tpc'], success: renderKV55, dataType: "xml"});
-            } else if (data[x]['type'] == 'ns') {
-                $("#tijden").append('<h1><a href="overzicht.html?tpc='+data[x]['tpc']+'">'+data[x]['naam']+'</a></h1><div id="tpc_'+data[x]['tpc']+'">Laden van NS-API...</div>');
-                $.ajax({url: "http://nsapi.xmpp.openov.nl/stations/"+data[x]['tpc']+"/avt/", success: renderNSAPIDisco, dataType: "xml"});
-            } else if (data[x]['type'] == 'irail') {
-                $("#tijden").append('<h1><a href="overzicht.html?tpc='+data[x]['tpc']+'">'+data[x]['naam']+'</a></h1><div id="tpc_'+data[x]['tpc'].replace(/[.]/g, "_")+'">Laden van iRail...</div>');
-                $.ajax({url: "http://api.irail.be/liveboard/?id="+data[x]['tpc'], success: renderIRail, dataType: "xml"});
-            } else if (data[x]['type'] == 'statisch') {
-                $("#tijden").append('<h1><a href="overzicht.html?tpc='+data[x]['tpc']+'">'+data[x]['naam']+'</a></h1><div id="tpc_'+data[x]['tpc']+'">Van deze halte hebben we alleen statische gegevens, deze worden nog niet weergegeven.</div>');
-            } else {
-                $("#tijden").append('<h1><a href="overzicht.html?tpc='+data[x]['tpc']+'">'+data[x]['naam']+'</a></h1><div id="tpc_'+data[x]['tpc']+'">Helaas hebben we van deze halte alleen een locatie.</div>');
+            if ((x <= 4) || (data[x]['distance'] < 40)) {
+                if (data[x]['type'] == 'kv55') {
+                    $("#tijden").append('<h1><a href="overzicht.html?tpc='+data[x]['tpc']+'">'+data[x]['naam']+'</a></h1><div id="tpc_'+data[x]['tpc']+'">Laden van GOVI...</div>');
+                    $.ajax({url: "http://cache.govi.openov.nl/kv55/"+data[x]['tpc'], success: renderKV55, dataType: "xml"});
+                } else if (data[x]['type'] == 'kv55-arriva') {
+                    $("#tijden").append('<h1><a href="overzicht.html?tpc='+data[x]['tpc']+'">'+data[x]['naam']+'</a></h1><div id="tpc_'+data[x]['tpc']+'">Laden van Arriva...</div>');
+                    $.ajax({url: "http://cache.govi.openov.nl/arriva/"+data[x]['tpc'], success: renderKV55, dataType: "xml"});
+                } else if (data[x]['type'] == 'ns') {
+                    $("#tijden").append('<h1><a href="overzicht.html?tpc='+data[x]['tpc']+'">'+data[x]['naam']+'</a></h1><div id="tpc_'+data[x]['tpc']+'">Laden van NS-API...</div>');
+                    $.ajax({url: "http://nsapi.xmpp.openov.nl/stations/"+data[x]['tpc']+"/avt/", success: renderNSAPIDisco, dataType: "xml"});
+                } else if (data[x]['type'] == 'irail') {
+                    $("#tijden").append('<h1><a href="overzicht.html?tpc='+data[x]['tpc']+'">'+data[x]['naam']+'</a></h1><div id="tpc_'+data[x]['tpc'].replace(/[.]/g, "_")+'">Laden van iRail...</div>');
+                    $.ajax({url: "http://api.irail.be/liveboard/?id="+data[x]['tpc'], success: renderIRail, dataType: "xml"});
+                } else if (data[x]['type'] == 'statisch') {
+                    $("#tijden").append('<h1><a href="overzicht.html?tpc='+data[x]['tpc']+'">'+data[x]['naam']+'</a></h1><div id="tpc_'+data[x]['tpc']+'">Van deze halte hebben we alleen statische gegevens, deze worden nog niet weergegeven.</div>');
+                } else {
+                    $("#tijden").append('<h1><a href="overzicht.html?tpc='+data[x]['tpc']+'">'+data[x]['naam']+'</a></h1><div id="tpc_'+data[x]['tpc']+'">Helaas hebben we van deze halte alleen een locatie.</div>');
+                }
             }
         }
     }
