@@ -6,6 +6,7 @@ body{
 }
 
 #tijden {
+ overflow: auto;
  padding: 1em;
  font-family: verdana, tahoma, sans-serif;
  position: absolute;
