@@ -178,10 +178,15 @@ function renderKV55(xmlDoc) {
         owner = trips[i].getElementsByTagName("DataOwnerCode")[0].childNodes[0].nodeValue;
         name = trips[i].getElementsByTagName("DestinationName")[0].childNodes[0].nodeValue;
         expected = trips[i].getElementsByTagName("ExpectedDepartureTime")[0].childNodes[0];
+        target = trips[i].getElementsByTagName("TargetDepartureTime")[0].childNodes[0].nodeValue;
         if (expected) {
-            expected = expected.nodeValue;
+            if (expected.nodeValue != target) {
+                expected = '<i>'+expected.nodeValue+'</i>';
+            } else {
+                expected = expected.nodeValue;
+            }
         } else {
-            expected = trips[i].getElementsByTagName("TargetDepartureTime")[0].childNodes[0].nodeValue;
+            expected = target
         }
 
         output += '<b>' + expected + '</b>' + '&nbsp;' + name + '<br />';
