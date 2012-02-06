@@ -16,8 +16,8 @@ function init() {
         defaultHandlerOptions: {
             'single': true,
             'double': false,
-            'pixelTolerance': 0,
-            'stopSingle': false,
+            'pixelTolerance': 4,
+            'stopSingle': true,
             'stopDouble': false
         },
 
