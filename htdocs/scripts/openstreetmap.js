@@ -184,21 +184,27 @@ function renderKV55(xmlDoc) {
     output = ''
     trips = xmlDoc.getElementsByTagName("Trip");
     for (i = 0; i < trips.length; i++) {
+        var time = '';
         owner = trips[i].getElementsByTagName("DataOwnerCode")[0].childNodes[0].nodeValue;
         name = trips[i].getElementsByTagName("DestinationName")[0].childNodes[0].nodeValue;
         expected = trips[i].getElementsByTagName("ExpectedDepartureTime")[0].childNodes[0];
         target = trips[i].getElementsByTagName("TargetDepartureTime")[0].childNodes[0].nodeValue;
-        if (expected) {
-            if (expected.nodeValue != target) {
-                expected = '<i>'+expected.nodeValue+'</i>';
-            } else {
-                expected = expected.nodeValue;
-            }
+        if (!expected) {
+            time = target
         } else {
-            expected = target
+            time = expected.nodeValue;
         }
 
-        output += '<b>' + expected + '</b>' + '&nbsp;' + name + '<br />';
+        // Convert 32h day to human readible day
+        timeparts = time.split(':', 3)
+        hour = (parseFloat(timeparts[0]) % 24)
+        time = addzero(hour) + ":" + timeparts[1] + ":" + timeparts[2];
+
+        if (expected.nodeValue != target) {
+            time = '<i>' + time + '</i>';
+        }
+
+        output += '<b>' + time + '</b>' + '&nbsp;' + name + '<br />';
     }
     $("#tpc_" + tpc).empty();
     $("#tpc_" + tpc).append(output);
