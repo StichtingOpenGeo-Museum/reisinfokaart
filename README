@@ -3,4 +3,7 @@ In deze repository vind je alles om zelf een interactieve kaart te maken.
 Het programma getfeature zorgt er voor dat iemand die op de kaart klikt van een punt of een steekwoord naar een bekende timingpointcode kan gaan. Wij gebruiken hiervoor SphinxSearch. Je kunt met Sphinx op een zelfde manier als MySQL verbinden en bevragen. Het is alleen in zijn eigen domein veel sneller dan MySQL. In de map kun je ook onze configuratie vinden. Je kunt de data downloaden via: http://mirror.openstreetmap.nl/govi/2011-12/openov_haltes.sql.gz
 
 Het programma getfeature.py kun je starten met:
-uwsgi --http 0.0.0.0:7000 -w getfeature
+uwsgi --http 0.0.0.0:80 -w getfeature
+
+of achter een webserver via uwsgi met:
+uwsgi --threads 4 --socket 127.0.0.1:5002 -w getfeature

@@ -34,7 +34,7 @@ function init() {
         trigger: function (e) {
             var lonlat = map.getLonLatFromViewPortPx(e.xy);
             lonlatGCS = lonlat.transform(new OpenLayers.Projection("EPSG:900913"), new OpenLayers.Projection("EPSG:4326"));
-            $.get('http://mijndev.openstreetmap.nl:7000?radius='+Math.floor(1000*(1-Math.log(map.zoom)) + 1800)+'&lat=' + lonlat.lat + '&lon=' + lonlat.lon, function (data) {
+            $.get('http://gazetteer.openov.nl/?radius='+Math.floor(1000*(1-Math.log(map.zoom)) + 1800)+'&lat=' + lonlat.lat + '&lon=' + lonlat.lon, function (data) {
                 if (data != null && data.length > 0) {
                     // alert(data[0]['naam']);
                     $("#tijden").empty();
@@ -172,7 +172,7 @@ function callbackGeocoder(data) {
 }
 
 function queryGeocoder(querystring, callback) {
-    $.get('http://mijndev.openstreetmap.nl:7000?'+querystring, callback, "json");
+    $.get('http://gazetteer.openov.nl/?'+querystring, callback, "json");
 }
 
 function renderKV55(xmlDoc) {
